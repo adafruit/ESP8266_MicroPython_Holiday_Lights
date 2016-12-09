@@ -80,9 +80,18 @@ np = neopixel.NeoPixel(PIXEL_PIN, PIXEL_COUNT)
 np.fill((0,0,0))
 np.write()
 
-# Load the animation configuration: Configuration/state that can change:
-with open(CONFIG_FILE, 'r') as infile:
-    config = ujson.loads(infile.read())
+# Try loading the animation configuration, otherwise fall back to a blank default.
+try:
+    with open(CONFIG_FILE, 'r') as infile:
+        config = ujson.loads(infile.read())
+except OSError:
+    # Couldn't load the config file, so fall back to a default blank animation.
+    config = {
+        'colors': [[0,0,0]],
+        'mirror_colors': False,
+        'period_ms': 250,
+        'animation': 'blank'
+    }
 
 # Mirror the color array if necessary.
 if config['mirror_colors']:

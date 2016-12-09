@@ -79,6 +79,11 @@
   function webreplConnect(url, password, onConnect, onError) {
     var ws = new WebSocket(url);
     ws.onopen = function() {
+      // Print messages received from the WebREPL.  Uncomment this to help with
+      // debugging.
+      ws.onmessage = function(e) {
+        console.log(e.data);
+      }
       // First send the password immediately since it's required to use WebREPL.
       ws.send(password + '\r\n');  // Send password and CR LF (like pressing enter).
       // Next send a Ctrl-C to stop any running main loop.
@@ -139,6 +144,7 @@
       var password = $('#password').val();
       // Connect to the board's REPL.
       webreplConnect(boardURL, password, function(ws) {
+        console.log('Connected!');
         // Connected, now convert config state to JSON bytes.
         var configJSON = JSON.stringify(config);
         var configBytes = new Uint8Array(configJSON.length);
@@ -153,6 +159,7 @@
         ws.send('import machine\r\nmachine.reset()\r\n');
         // Close the connection.
         ws.close();
+        console.log('Updated lights!');
       },
       function(e) {
         console.log('Error connecting to MicroPython board!');
